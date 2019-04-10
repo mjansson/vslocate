@@ -98,25 +98,24 @@ def get_vs_installations():
     configuration = ctypes.POINTER(ISetupConfiguration)()
     reserved = ctypes.c_void_p(0)
 
+    installations = []
+
     result = get_setup_configuration(ctypes.byref(configuration), reserved)
     if result != 0:
-    	print("Failed to get setup configuration: " + str(result))
-    	exit(result)
-
+        #print("Failed to get setup configuration: " + str(result))
+        return installations
 
     enum_instances = configuration.contents.vtable.contents.EnumInstances
 
     enum_setup_instances = ctypes.POINTER(IEnumSetupInstances)()
     result = enum_instances(configuration, ctypes.byref(enum_setup_instances))
     if result != 0:
-    	print("Failed to enum setup instances: " + str(result))
-    	exit(result)
+    	#print("Failed to enum setup instances: " + str(result))
+        return installations
 
 
     setup_instance = ctypes.POINTER(ISetupInstance)()
     fetched = ctypes.c_int(0)
-
-    installations = []
 
     while True:
         next = enum_setup_instances.contents.vtable.contents.Next
@@ -124,8 +123,8 @@ def get_vs_installations():
         if result == 1 or fetched == 0:
             break
         if result != 0:
-            print("Failed to get next setup instance: " + str(result))
-            exit(result)
+            #print("Failed to get next setup instance: " + str(result))
+            break
 
         version = ctypes.c_wchar_p()
         path = ctypes.c_wchar_p()
@@ -135,13 +134,13 @@ def get_vs_installations():
 
         result = get_installation_version(setup_instance, ctypes.byref(version))
         if result != 0:
-            print("Failed to get setup instance version: " + str(result))
-            exit(result)
+            #print("Failed to get setup instance version: " + str(result))
+            break
 
         result = get_installation_path(setup_instance, ctypes.byref(path))
         if result != 0:
-            print("Failed to get setup instance version: " + str(result))
-            exit(result)
+            #print("Failed to get setup instance version: " + str(result))
+            break
 
         installations.append((version.value, path.value))
 
