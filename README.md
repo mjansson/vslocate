@@ -1,6 +1,6 @@
-# Locate Visual Studio installations in Python and C (public domain)
+# Locate Visual Studio installations in Python and C
 
-Locating Visual Studio installations can be suprisingly hard. This repostitory provides basic implementations for doing this in Python and C, by using the Visual Studio Setup Configuration utility DLL installed by Visual Studio.
+Locating Visual Studio installations can be suprisingly hard. This repostitory provides basic implementations for doing this in Python and C, by using the Visual Studio Setup Configuration utility DLL installed by Visual Studio. The code is released to the public domain.
 
 ## Python
 
