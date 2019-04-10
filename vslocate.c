@@ -4,6 +4,13 @@
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 
+// Callback for receiving installation instances
+typedef void (*instance_callback)(const wchar_t* version, const wchar_t* path);
+
+extern int
+get_vs_installations(instance_callback callback);
+
+
 typedef struct ISetupInstanceVTable ISetupInstanceVTable;
 typedef struct ISetupInstance ISetupInstance;
 
@@ -125,7 +132,7 @@ typedef HRESULT(__stdcall* GetSetupConfigurationFn)(
 	ISetupConfiguration** configuration,
 	void* reserved);
 
-size_t
+static size_t
 environment_variable(const char* variable, char* value, size_t capacity) {
 	unsigned int required;
 	if ((required = GetEnvironmentVariableA(variable, value, (unsigned int)capacity)) > capacity)
@@ -133,7 +140,7 @@ environment_variable(const char* variable, char* value, size_t capacity) {
 	return (required > 0) ? required : 0;
 }
 
-size_t
+static size_t
 get_library_path(char* path, size_t capacity) {
 #if defined( __x86_64__ ) ||  defined( __x86_64 ) || defined( __amd64 ) || defined( _M_AMD64 ) || defined( _AMD64_ )
 	const char subpath[] = "\\Microsoft\\VisualStudio\\Setup\\x64\\Microsoft.VisualStudio.Setup.Configuration.Native.dll\0";
@@ -149,13 +156,11 @@ get_library_path(char* path, size_t capacity) {
 	return path_length + subpath_length;
 }
 
+
 int
-main(int argc, char** argv) {
+get_vs_installations(instance_callback callback) {
 	HMODULE lib = 0;
 	int result = -1;
-
-	(void)sizeof(argc);
-	(void)sizeof(argv);
 
 	char lib_path[512];
 	size_t path_length = get_library_path(lib_path, sizeof(lib_path));
@@ -218,3 +223,20 @@ cleanup:
 
 	return result;
 }
+
+#ifdef COMPILE_TOOL
+
+static void
+print_callback(const wchar_t* version, const wchar_t* path) {
+	printf("%ls %ls\n", version, path);
+}
+
+int
+main(int argc, char** argv) {
+	(void)sizeof(argc);
+	(void)sizeof(argv);
+
+	return get_vs_installations(print_callback);
+}
+
+#endif

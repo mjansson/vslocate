@@ -5,7 +5,7 @@
 import os
 import ctypes
 
-def get_installations():
+def get_vs_installations():
 
     class ISetupInstanceVTable(ctypes.Structure):
         """Class matching VisualStudio Setup package ISetupInstance vtable"""
@@ -150,7 +150,7 @@ def get_installations():
 
 if __name__ == "__main__":
 
-    installations = get_installations()
+    installations = get_vs_installations()
 
     for version, path in installations:
         print(version + " " + path)
